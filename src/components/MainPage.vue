@@ -20,6 +20,16 @@
       Parse
     </v-btn>
 
+    <v-btn
+      v-if="fourierReady"
+      class="mt-4"
+      variant="elevated"
+      color="primary"
+      @click="$emit('start')"
+    >
+      Start
+    </v-btn>
+
     <div v-if="originalSvg" class="mt-6">
       <h3 class="text-h6 mb-2">Original SVG</h3>
       <div class="svg-preview" v-html="originalSvg"></div>
@@ -37,9 +47,13 @@ defineProps({
     type: String,
     default: "",
   },
+  fourierReady: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-defineEmits(["update:selectedFiles", "parse"]);
+defineEmits(["update:selectedFiles", "parse", "start"]);
 </script>
 
 <style scoped>

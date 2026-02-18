@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FourierCoeff } from '../lib/dft.ts'
 
@@ -28,6 +28,14 @@ const canvasHeight = ref(600)
 const fourierCircles = ref<FourierCoeff[]>([])
 const scale = ref(0.8)
 const speed = ref(1)
+
+const autoScale = computed(() => {
+  if (!fourierCircles.value.length) return 1
+  const sumAmp = fourierCircles.value.reduce((acc, c) => acc + Math.abs(c.amp), 0)
+  if (sumAmp === 0) return 1
+  const target = Math.min(canvasWidth.value, canvasHeight.value) * 0.45
+  return target / sumAmp
+})
 
 onMounted(() => {
   const stored = sessionStorage.getItem('fourierCoeffs')
@@ -97,8 +105,10 @@ function draw(): void {
 
     const angle = circle.freq * time + circle.phase
 
-    currentX += circle.amp * scale.value * Math.cos(angle)
-    currentY += circle.amp * scale.value * Math.sin(angle)
+    const s = autoScale.value * scale.value
+
+    currentX += circle.amp * s * Math.cos(angle)
+    currentY += circle.amp * s * Math.sin(angle)
 
     ctx.beginPath()
     ctx.arc(prevX, prevY, circle.amp * scale.value, 0, Math.PI * 2)

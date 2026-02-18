@@ -9,22 +9,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import type { FourierCoeff } from '../lib/dft.ts'
 
 const router = useRouter()
-const canvas = ref(null)
-let ctx = null
-let animationFrameId = null
+const canvas = ref<HTMLCanvasElement | null>(null)
+let ctx: CanvasRenderingContext2D | null = null
+let animationFrameId = 0
 
 let time = 0
-const pathHistory = []
+const pathHistory: Array<{ x: number; y: number }> = []
 
 const canvasWidth = ref(600)
 const canvasHeight = ref(600)
 
-const fourierCircles = ref([])
+const fourierCircles = ref<FourierCoeff[]>([])
 const scale = ref(0.8)
 const speed = ref(1)
 
@@ -32,7 +33,7 @@ onMounted(() => {
   const stored = sessionStorage.getItem('fourierCoeffs')
   if (stored) {
     try {
-      fourierCircles.value = JSON.parse(stored)
+      fourierCircles.value = JSON.parse(stored) as FourierCoeff[]
     } catch (e) {
       console.error('Failed to parse fourierCoeffs:', e)
       router.push('/')
@@ -42,6 +43,8 @@ onMounted(() => {
     router.push('/')
     return
   }
+
+  if (!canvas.value) return
 
   ctx = canvas.value.getContext('2d')
   const observer = new ResizeObserver((entries) => {
@@ -76,7 +79,7 @@ watch(
   { deep: true },
 )
 
-function draw() {
+function draw(): void {
   if (!ctx || !fourierCircles.value.length) return
 
   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value)

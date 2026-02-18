@@ -7,53 +7,48 @@
       multiple
       show-size
       clearable
-      :model-value="selectedFiles"
-      @update:model-value="$emit('update:selectedFiles', $event)"
+      :model-value="props.selectedFiles"
+      @update:model-value="(files) => emit('update:selectedFiles', files as File[] | null ?? [])"
     />
     <v-btn
       class="mt-4"
       variant="elevated"
       color="primary"
-      :disabled="!selectedFiles?.length"
-      @click="$emit('parse')"
+      :disabled="!props.selectedFiles?.length"
+      @click="emit('parse')"
     >
       Parse
     </v-btn>
 
     <v-btn
-      v-if="fourierReady"
+      v-if="props.fourierReady"
       class="mt-4"
       variant="elevated"
       color="primary"
-      @click="$emit('start')"
+      @click="emit('start')"
     >
       Start
     </v-btn>
 
-    <div v-if="originalSvg" class="mt-6">
+    <div v-if="props.originalSvg" class="mt-6">
       <h3 class="text-h6 mb-2">Original SVG</h3>
-      <div class="svg-preview" v-html="originalSvg"></div>
+      <div class="svg-preview" v-html="props.originalSvg"></div>
     </div>
   </div>
 </template>
 
-<script setup>
-defineProps({
-  selectedFiles: {
-    type: Array,
-    default: () => [],
-  },
-  originalSvg: {
-    type: String,
-    default: "",
-  },
-  fourierReady: {
-    type: Boolean,
-    default: false,
-  },
-});
+<script setup lang="ts">
+const props = defineProps<{
+  selectedFiles: File[]
+  originalSvg: string
+  fourierReady: boolean
+}>()
 
-defineEmits(["update:selectedFiles", "parse", "start"]);
+const emit = defineEmits<{
+  (e: 'update:selectedFiles', value: File[]): void
+  (e: 'parse'): void
+  (e: 'start'): void
+}>()
 </script>
 
 <style scoped>

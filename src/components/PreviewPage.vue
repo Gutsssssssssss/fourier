@@ -26,27 +26,25 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from "vue";
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { FourierPoint } from '../lib/dft.ts'
 
-const props = defineProps({
-  sampledPoints: {
-    type: Array,
-    default: () => [],
-  },
-});
+const props = defineProps<{
+  sampledPoints: FourierPoint[]
+}>()
 
 const bounds = computed(() => {
   if (props.sampledPoints.length === 0) {
-    return { minX: 0, maxX: 0, minY: 0, maxY: 0, width: 0, height: 0 };
+    return { minX: 0, maxX: 0, minY: 0, maxY: 0, width: 0, height: 0 }
   }
 
-  const xs = props.sampledPoints.map((p) => p.x);
-  const ys = props.sampledPoints.map((p) => p.y);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
+  const xs = props.sampledPoints.map((p) => p.x)
+  const ys = props.sampledPoints.map((p) => p.y)
+  const minX = Math.min(...xs)
+  const maxX = Math.max(...xs)
+  const minY = Math.min(...ys)
+  const maxY = Math.max(...ys)
 
   return {
     minX,
@@ -55,28 +53,28 @@ const bounds = computed(() => {
     maxY,
     width: maxX - minX || 1,
     height: maxY - minY || 1,
-  };
-});
+  }
+})
 
 const svgViewBox = computed(() => {
-  const { minX, minY, width, height } = bounds.value;
-  if (width === 0 && height === 0) return "0 0 100 100";
+  const { minX, minY, width, height } = bounds.value
+  if (width === 0 && height === 0) return '0 0 100 100'
 
-  const padding = Math.max(width, height) * 0.1;
-  return `${minX - padding} ${minY - padding} ${width + padding * 2} ${height + padding * 2}`;
-});
+  const padding = Math.max(width, height) * 0.1
+  return `${minX - padding} ${minY - padding} ${width + padding * 2} ${height + padding * 2}`
+})
 
 const svgPath = computed(() => {
-  if (props.sampledPoints.length === 0) return "";
+  if (props.sampledPoints.length === 0) return ''
 
   return props.sampledPoints
     .map((point, index) => {
-      const x = point.x;
-      const y = point.y;
-      return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+      const x = point.x
+      const y = point.y
+      return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`
     })
-    .join(" ");
-});
+    .join(' ')
+})
 </script>
 
 <style scoped>

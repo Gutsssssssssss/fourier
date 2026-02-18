@@ -21,19 +21,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import MainPage from '../components/MainPage.vue'
 import PreviewPage from '../components/PreviewPage.vue'
-import { computeDFT } from '../lib/dft.js'
+import { computeDFT, type FourierPoint, type FourierCoeff } from '../lib/dft.ts'
 
 const router = useRouter()
 
-const selectedFiles = ref([])
-const sampledPoints = ref([])
+const selectedFiles = ref<File[]>([])
+const sampledPoints = ref<FourierPoint[]>([])
 const originalSvg = ref('')
-const fourierCoeffs = ref([])
+const fourierCoeffs = ref<FourierCoeff[]>([])
 
 watch(
   selectedFiles,
@@ -45,7 +45,7 @@ watch(
   { deep: true },
 )
 
-async function onParse() {
+async function onParse(): Promise<void> {
   if (selectedFiles.value.length === 0) return
 
   const file = selectedFiles.value[0]
@@ -64,7 +64,7 @@ async function onParse() {
 
   const numSamples = 500
   const totalLength = pathElements.getTotalLength()
-  const points = []
+  const points: FourierPoint[] = []
 
   for (let i = 0; i <= numSamples; i++) {
     const distance = (i / numSamples) * totalLength
@@ -81,7 +81,7 @@ async function onParse() {
   const avgX = sumX / points.length
   const avgY = sumY / points.length
 
-  const normalizedPoints = points.map((p) => ({
+  const normalizedPoints: FourierPoint[] = points.map((p) => ({
     x: p.x - avgX,
     y: p.y - avgY,
   }))
@@ -90,7 +90,7 @@ async function onParse() {
   fourierCoeffs.value = computeDFT(normalizedPoints)
 }
 
-function onStart() {
+function onStart(): void {
   sessionStorage.setItem('fourierCoeffs', JSON.stringify(fourierCoeffs.value))
   router.push({ name: 'animation' })
 }

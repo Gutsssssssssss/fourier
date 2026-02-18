@@ -32,10 +32,6 @@ export function computeDFT(points: FourierPoint[]): FourierCoeff[] {
       phase: Math.atan2(im, re),
     }
   })
-  return fourier.reduce<FourierCoeff[]>((acc, coeff) => {
-    const idx = acc.findIndex((c) => c.amp < coeff.amp)
-    const i = idx === -1 ? acc.length : idx
-    return [...acc.slice(0, i), coeff, ...acc.slice(i)]
-  }, [])
+  return fourier.sort((a, b) => b.amp - a.amp)
 }
 

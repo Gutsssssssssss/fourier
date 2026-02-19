@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { FourierPoint } from '../lib/dft.ts'
+import type { FourierPoint } from '@/lib/dft.ts'
 
 const props = defineProps<{
   sampledPoints: FourierPoint[]

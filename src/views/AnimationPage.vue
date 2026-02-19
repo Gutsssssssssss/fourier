@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { FourierCoeff } from '../lib/dft.ts'
+import type { FourierCoeff } from '@/lib/dft.ts'
 
 const router = useRouter()
 const canvas = ref<HTMLCanvasElement | null>(null)
@@ -59,15 +59,17 @@ onMounted(() => {
     for (const entry of entries) {
       canvasWidth.value = entry.contentRect.width
       canvasHeight.value = entry.contentRect.height
-      canvas.value.width = canvasWidth.value
-      canvas.value.height = canvasHeight.value
+      canvas.value!.width = canvasWidth.value
+      canvas.value!.height = canvasHeight.value
       if (fourierCircles.value.length > 0) {
         cancelAnimationFrame(animationFrameId)
         animationFrameId = requestAnimationFrame(draw)
       }
     }
   })
-  observer.observe(canvas.value.parentElement)
+  const parent = canvas.value.parentElement
+  if (!parent) return
+  observer.observe(parent)
 })
 
 onUnmounted(() => {
@@ -98,8 +100,7 @@ function draw(): void {
   let currentX = 0
   let currentY = 0
 
-  for (let i = 0; i < fourierCircles.value.length; i++) {
-    const circle = fourierCircles.value[i]
+  for (const circle of fourierCircles.value) {
     const prevX = currentX
     const prevY = currentY
 
@@ -124,10 +125,16 @@ function draw(): void {
 
   pathHistory.push({ x: currentX, y: currentY })
 
+  const first = pathHistory[0]
+  if (!first) {
+    ctx.restore()
+    return
+  }
+
   ctx.beginPath()
-  ctx.moveTo(pathHistory[0].x, pathHistory[0].y)
+  ctx.moveTo(first.x, first.y)
   for (let i = 1; i < pathHistory.length; i++) {
-    ctx.lineTo(pathHistory[i].x, pathHistory[i].y)
+    ctx.lineTo(pathHistory[i]!.x, pathHistory[i]!.y)
   }
   ctx.strokeStyle = '#ff0000'
   ctx.lineWidth = 2
@@ -135,7 +142,9 @@ function draw(): void {
 
   ctx.restore()
 
-  time += speed.value * (Math.PI * 2 / fourierCircles.value.length) * 0.01
+  const secondsPerLoop = 5
+  const fpsAssumed = 60
+  time += speed.value * (Math.PI * 2 / secondsPerLoop) * (1 / fpsAssumed)
 
   if (time < Math.PI * 2) {
     animationFrameId = requestAnimationFrame(draw)

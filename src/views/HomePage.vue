@@ -24,9 +24,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import MainPage from '../components/MainPage.vue'
-import PreviewPage from '../components/PreviewPage.vue'
-import { computeDFT, type FourierPoint, type FourierCoeff } from '../lib/dft.ts'
+import MainPage from '@/components/MainPage.vue'
+import PreviewPage from '@/components/PreviewPage.vue'
+import { computeDFT, type FourierPoint, type FourierCoeff } from '@/lib/dft'
 
 const router = useRouter()
 
@@ -49,6 +49,8 @@ async function onParse(): Promise<void> {
   if (selectedFiles.value.length === 0) return
 
   const file = selectedFiles.value[0]
+  if (!file) return
+
   const text = await file.text()
 
   originalSvg.value = text

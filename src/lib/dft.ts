@@ -19,10 +19,10 @@ export function computeDFT(points: FourierPoint[]): FourierCoeff[] {
     let re = 0
     let im = 0
 
-    for (let n = 0; n < N; n++) {
+    for (const [n, p] of points.entries()) {
       const phi = (2 * Math.PI * k * n) / N
-      re += points[n].x * Math.cos(phi) + points[n].y * Math.sin(phi)
-      im += -points[n].x * Math.sin(phi) + points[n].y * Math.cos(phi)
+      re += p.x * Math.cos(phi) + p.y * Math.sin(phi)
+      im += -p.x * Math.sin(phi) + p.y * Math.cos(phi)
     }
 
     re /= N

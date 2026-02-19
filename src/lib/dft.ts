@@ -13,25 +13,32 @@ export interface FourierCoeff {
 
 export function computeDFT(points: FourierPoint[]): FourierCoeff[] {
   const N = points.length
-  const fourier = Array.from({ length: N }, (_, k) => {
-    const re =
-      points.reduce((sum, p, n) => {
-        const phi = (2 * Math.PI * k * n) / N
-        return sum + p.x * Math.cos(phi) + p.y * Math.sin(phi)
-      }, 0) / N
-    const im =
-      points.reduce((sum, p, n) => {
-        const phi = (2 * Math.PI * k * n) / N
-        return sum + -p.x * Math.sin(phi) + p.y * Math.cos(phi)
-      }, 0) / N
-    return {
+  const fourier: FourierCoeff[] = []
+
+  for (let k = 0; k < N; k++) {
+    let re = 0
+    let im = 0
+
+    for (let n = 0; n < N; n++) {
+      const phi = (2 * Math.PI * k * n) / N
+      re += points[n].x * Math.cos(phi) + points[n].y * Math.sin(phi)
+      im += -points[n].x * Math.sin(phi) + points[n].y * Math.cos(phi)
+    }
+
+    re /= N
+    im /= N
+
+    const freq = k <= N / 2 ? k : k - N
+
+    fourier.push({
       re,
       im,
-      freq: k,
-      amp: Math.sqrt(re * re + im * im),
+      freq,
+      amp: Math.hypot(re, im),
       phase: Math.atan2(im, re),
-    }
-  })
+    })
+  }
+
   return fourier.sort((a, b) => b.amp - a.amp)
 }
 

@@ -9,15 +9,7 @@
         xmlns="http://www.w3.org/2000/svg"
         class="sampled-svg"
       >
-        <path :d="svgPath" fill="none" stroke="#000" stroke-width="2" />
-        <circle
-          v-for="(point, index) in sampledPoints"
-          :key="index"
-          :cx="point.x"
-          :cy="point.y"
-          r="2"
-          fill="#ff0000"
-        />
+        <path :d="svgPath" fill="none" stroke="#000" stroke-width="0.1" />
       </svg>
     </div>
   </div>
